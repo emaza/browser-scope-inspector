@@ -6,7 +6,7 @@
 
 This contains everything you need to run your app locally.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1bKuVTnvG-3lrHE15dFgu9FM1jb7aHXua
+View this app: https://browser-scope-inspector-de-privacidad-158294595550.us-west1.run.app/
 
 ## Run Locally
 
