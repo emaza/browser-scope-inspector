@@ -1,0 +1,9 @@
+{
+  "name": "Browser Scope - Inspector de Privacidad",
+  "description": "Una herramienta de análisis forense del navegador que revela qué información puede ser extraída de tu dispositivo mediante APIs web estándar.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
