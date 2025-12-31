@@ -1,7 +1,7 @@
 /** @jsx React.createElement */
 /** @jsxFrag React.Fragment */
 import React from 'react';
-import { ShieldCheck, Eye, Info } from 'lucide-react';
+import { ShieldCheck, Eye, Info, Github } from 'lucide-react';
 import HardwareSection from './components/HardwareSection';
 import DisplaySection from './components/DisplaySection';
 import FingerprintSection from './components/FingerprintSection';
@@ -34,9 +34,22 @@ const App: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-4 py-2 rounded-full border border-slate-800">
-            <ShieldCheck size={14} className="text-green-500" />
-            <span>Datos generados localmente. Nada sale de tu dispositivo.</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
+            <a 
+              href="https://github.com/emaza/browser-scope-inspector"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50 p-2 rounded-lg transition-all group"
+              title="Ver código fuente en GitHub"
+            >
+              <Github size={22} className="group-hover:scale-110 transition-transform" />
+              <span className="md:hidden text-sm font-medium">Ver en GitHub</span>
+            </a>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-4 py-2 rounded-full border border-slate-800">
+              <ShieldCheck size={14} className="text-green-500 shrink-0" />
+              <span>Datos generados localmente. Nada sale de tu dispositivo.</span>
+            </div>
           </div>
         </header>
 
