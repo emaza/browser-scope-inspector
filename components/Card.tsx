@@ -22,9 +22,9 @@ export const Card: React.FC<SectionProps> = ({ title, icon, description, childre
   );
 };
 
-export const DataRow: React.FC<{ label: string; value: string | number | React.ReactNode; highlight?: boolean }> = ({ label, value, highlight = false }) => (
+export const DataRow: React.FC<{ label: string | React.ReactNode; value: string | number | React.ReactNode; highlight?: boolean }> = ({ label, value, highlight = false }) => (
   <div className="flex justify-between items-center py-2 border-b border-slate-700/50 last:border-0 hover:bg-slate-700/30 px-2 rounded transition-colors">
-    <span className="text-slate-400 font-medium">{label}</span>
+    <span className="text-slate-400 font-medium flex-1">{label}</span>
     <span className={`font-mono text-right ${highlight ? 'text-sky-400 font-bold' : 'text-slate-200'}`}>
       {value}
     </span>
