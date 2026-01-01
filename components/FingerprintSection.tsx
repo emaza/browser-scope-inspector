@@ -1,13 +1,14 @@
 /** @jsx React.createElement */
 /** @jsxFrag React.Fragment */
 import React, { useEffect, useState } from 'react';
-import { Fingerprint, ScanFace } from 'lucide-react';
+import { Fingerprint, Database, Check, X } from 'lucide-react';
 import { Card, DataRow } from './Card';
 
 const FingerprintSection: React.FC = () => {
   const [canvasHash, setCanvasHash] = useState<string>('Calculando...');
   const [audioHash, setAudioHash] = useState<string>('Calculando...');
   const [fonts, setFonts] = useState<string[]>([]);
+  const [capabilities, setCapabilities] = useState<Record<string, boolean>>({});
 
   // Simple hashing function for demo
   const cyrb53 = (str: string, seed = 0) => {
@@ -57,7 +58,6 @@ const FingerprintSection: React.FC = () => {
         const detected: string[] = [];
         
         // Basic logic: compare width of string in specific font vs fallback
-        // This is a simplified version of complex font enumeration libraries
         const baseFonts = ['monospace', 'sans-serif', 'serif'];
         const testString = "mmmmmmmmmmlli";
         
@@ -133,9 +133,29 @@ const FingerprintSection: React.FC = () => {
         }
     };
 
+    // 4. Storage & API Capabilities Detection
+    const checkCapabilities = () => {
+        const caps = {
+            'Cookies': navigator.cookieEnabled,
+            'LocalStorage': !!window.localStorage,
+            'IndexedDB': !!window.indexedDB,
+            'CacheStorage': 'caches' in window,
+            'ServiceWorkers': 'serviceWorker' in navigator,
+            'WebSQL': 'openDatabase' in window, // Deprecated in most modern browsers
+            'AppCache': 'applicationCache' in window, // Deprecated
+            'FileSystem': 'webkitRequestFileSystem' in window || 'requestFileSystem' in window,
+            'Downloads': 'download' in document.createElement('a'),
+            'History API': !!window.history,
+            'FormData': 'FormData' in window,
+            'Passwords API': 'PasswordCredential' in window || 'CredentialsContainer' in window
+        };
+        setCapabilities(caps);
+    };
+
     generateCanvasHash();
     detectFonts();
     generateAudioHash();
+    checkCapabilities();
   }, []);
 
   return (
@@ -152,9 +172,11 @@ const FingerprintSection: React.FC = () => {
         label="Audio Context Hash" 
         value={<span className="text-xs font-mono bg-slate-900 px-1 py-0.5 rounded text-amber-500">{audioHash}</span>} 
       />
+      
+      {/* Fonts Section */}
       <div className="mt-3">
         <span className="text-slate-400 font-medium text-sm">Fuentes Detectadas (Muestra):</span>
-        <div className="flex flex-wrap gap-1 mt-2">
+        <div className="flex flex-wrap gap-1 mt-2 mb-4">
             {fonts.map(f => (
                 <span key={f} className="px-2 py-1 bg-slate-700 text-slate-200 text-xs rounded-full border border-slate-600">
                     {f}
@@ -162,6 +184,29 @@ const FingerprintSection: React.FC = () => {
             ))}
             {fonts.length === 0 && <span className="text-xs text-slate-500">Analizando...</span>}
         </div>
+      </div>
+
+      {/* Capabilities Section */}
+      <div className="mt-4 pt-3 border-t border-slate-700/50">
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+             <Database size={12} /> APIs y Almacenamiento
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+              {Object.entries(capabilities).map(([key, supported]) => (
+                  <div key={key} className="flex items-center justify-between bg-slate-900/40 px-2 py-1.5 rounded border border-slate-800">
+                      <span className="text-xs text-slate-300">{key}</span>
+                      {supported ? (
+                          <div className="flex items-center gap-1 text-[10px] text-green-400 font-bold uppercase">
+                              <Check size={10} strokeWidth={4} /> Sí
+                          </div>
+                      ) : (
+                          <div className="flex items-center gap-1 text-[10px] text-slate-600 font-bold uppercase">
+                              <X size={10} strokeWidth={4} /> No
+                          </div>
+                      )}
+                  </div>
+              ))}
+          </div>
       </div>
     </Card>
   );

@@ -1,11 +1,12 @@
 /** @jsx React.createElement */
 /** @jsxFrag React.Fragment */
 import React, { useEffect, useState, useRef } from 'react';
-import { MousePointer2, Keyboard, Activity } from 'lucide-react';
+import { MousePointer2, Keyboard, Activity, Move } from 'lucide-react';
 import { Card } from './Card';
 
 const BehaviorSection: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [scrollPos, setScrollPos] = useState({ x: window.scrollX, y: window.scrollY });
   const [clicks, setClicks] = useState(0);
   const [keystrokes, setKeystrokes] = useState<number[]>([]);
   const [text, setText] = useState('');
@@ -38,12 +39,18 @@ const BehaviorSection: React.FC = () => {
       setClicks(prev => prev + 1);
     };
 
+    const handleScroll = () => {
+        setScrollPos({ x: window.scrollX, y: window.scrollY });
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('click', handleClick);
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleClick);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -70,33 +77,37 @@ const BehaviorSection: React.FC = () => {
   return (
     <Card 
       title="Biometría del Comportamiento" 
-      description="Cómo interactúas con la página (Mouse y Teclado)."
+      description="Cómo interactúas con la página (Mouse, Scroll y Teclado)."
       icon={<Activity size={20} />}
       className="col-span-1 md:col-span-2 lg:col-span-3"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {/* Mouse Tracking */}
+        {/* Mouse & Scroll Tracking */}
         <div className="space-y-4">
             <h3 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                <MousePointer2 size={16} /> Rastreo del Cursor
+                <MousePointer2 size={16} /> Navegación y Cursor
             </h3>
             <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="bg-slate-900 p-3 rounded border border-slate-700">
-                    <span className="block text-slate-500 mb-1">Posición Actual</span>
+                    <span className="block text-slate-500 mb-1">Cursor (Viewport)</span>
                     <span className="font-mono text-sky-400">X: {mousePos.x}, Y: {mousePos.y}</span>
                 </div>
                 <div className="bg-slate-900 p-3 rounded border border-slate-700">
-                    <span className="block text-slate-500 mb-1">Distancia Recorrida</span>
+                    <span className="block text-slate-500 mb-1">Scroll (Desplazamiento)</span>
+                    <span className="font-mono text-emerald-400">X: {scrollPos.x.toFixed(0)}, Y: {scrollPos.y.toFixed(0)}</span>
+                </div>
+                <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                    <span className="block text-slate-500 mb-1">Distancia Cursor</span>
                     <span className="font-mono text-sky-400">{totalDistance} px</span>
                 </div>
-                <div className="bg-slate-900 p-3 rounded border border-slate-700 col-span-2">
-                    <span className="block text-slate-500 mb-1">Total Clics (Sesión)</span>
+                <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                    <span className="block text-slate-500 mb-1">Total Clics</span>
                     <span className="font-mono text-sky-400">{clicks}</span>
                 </div>
             </div>
             <p className="text-xs text-slate-500 italic mt-2">
-                * Tu navegador reporta cada micro-movimiento, lo cual puede usarse para generar un mapa de calor o validar si eres humano (reCAPTCHA v3).
+                * Tu navegador reporta cada micro-movimiento del mouse y cada píxel de desplazamiento (scroll), permitiendo crear un perfil de comportamiento único.
             </p>
         </div>
 
