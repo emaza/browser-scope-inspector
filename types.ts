@@ -1,6 +1,3 @@
-import React from 'react';
-
-// Extended Navigator interfaces for non-standard or newer APIs
 export interface ExtendedNavigator extends Navigator {
   deviceMemory?: number;
   connection?: NetworkInformation;
@@ -24,14 +21,6 @@ export interface NetworkInformation extends EventTarget {
   rtt?: number;
   saveData?: boolean;
   type?: 'bluetooth' | 'cellular' | 'ethernet' | 'none' | 'wifi' | 'wimax' | 'other' | 'unknown';
-}
-
-export interface SectionProps {
-  title: string;
-  icon: React.ReactNode;
-  description: string;
-  children: React.ReactNode;
-  className?: string;
 }
 
 export interface FingerprintData {
