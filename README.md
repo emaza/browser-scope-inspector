@@ -1,8 +1,5 @@
 # browser-scope-inspector 
-Browser Scope Inspector is a web application that displays the data and permissions to which the browser has access. It was developed using the AI ​​Jules under the guidance of a human.
-
-
-This project was coded by Jules, an AI software engineer, with a human project manager overseeing the development.
+Browser Scope Inspector is a web application that displays the data and permissions to which the browser has access. It was developed by Jules, an AI software engineer, under human guidance.
 
 ## Running the Application
 
@@ -18,4 +15,4 @@ To run this application on your local machine, follow these steps:
     npm run dev
     ```
 
-The application will be available at [campanadas.zik.es](https://browser-scope-inspector.zik.es/).
+The application will be available at [browser-scope-inspector.zik.es](https://browser-scope-inspector.zik.es/).
