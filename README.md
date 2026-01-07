@@ -1,20 +1,18 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# browser-scope-inspector 
+Browser Scope Inspector is a web application that displays the data and permissions to which the browser has access. It was developed by Jules, an AI software engineer, under human guidance.
 
-# Run and deploy your AI Studio app
+## Running the Application
 
-This contains everything you need to run your app locally.
+To run this application on your local machine, follow these steps:
 
-View your app in AI Studio: https://ai.studio/apps/drive/1bKuVTnvG-3lrHE15dFgu9FM1jb7aHXua
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-## Run Locally
+2.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The application will be available at [browser-scope-inspector.zik.es](https://browser-scope-inspector.zik.es/).
