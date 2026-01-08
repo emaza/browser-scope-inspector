@@ -254,7 +254,15 @@
             recognition.onresult = (event: any) => {
                 let finalTrans = "";
                 let interimTrans = "";
+                const resultsArray = Array.from(event.results).map((r) =>
+                    Array.from(r).map((alternative) => ({
+                        transcript: alternative.transcript,
+                        confidence: alternative.confidence,
+                        isFinal: r.isFinal,
+                    })),
+                );
 
+                console.log(JSON.stringify(resultsArray, null, 2));
                 for (let i = 0; i < event.results.length; i++) {
                     const text = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
