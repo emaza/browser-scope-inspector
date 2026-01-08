@@ -265,7 +265,7 @@
                     } of alternatives) {
                         if (!transcript) continue;
 
-                        if (isFinal && confidence > 0) {
+                        if (isFinal && confidence !== 0) {
                             finalTranscript += transcript;
                             interimTranscript = "";
                             continue;
