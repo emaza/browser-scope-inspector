@@ -270,6 +270,7 @@
                         const text = results[i].transcript;
                         if (results[i].isFinal && results[i].confidence > 0) {
                             finalTrans += text;
+                            interimTrans = ""
                         } else {
                             interimTrans += text;
                         }
