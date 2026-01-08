@@ -252,19 +252,35 @@
             };
 
             recognition.onresult = (event: any) => {
-                let finalTrans = "";
-                let interimTrans = "";
+                let finalTranscript = "";
+                let interimTranscript = "";
 
-                for (let i = 0; i < event.results.length; i++) {
-                    const text = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTrans += text;
-                    } else {
-                        interimTrans += text;
+                const results = normalizeResults(event.results);
+
+                for (const alternatives of results) {
+                    for (const {
+                        transcript,
+                        confidence,
+                        isFinal,
+                    } of alternatives) {
+                        if (!transcript) continue;
+
+                        if (isFinal && confidence > 0) {
+                            finalTranscript += transcript;
+                            interimTranscript = "";
+                            continue;
+                        }
+
+                        interimTranscript = mergeIncrementalTranscript(
+                            interimTranscript,
+                            transcript,
+                        );
                     }
                 }
+
                 transcript =
-                    finalTrans + (interimTrans ? ` [${interimTrans}]` : "");
+                    finalTranscript +
+                    (interimTranscript ? ` [${interimTranscript}]` : "");
             };
 
             recognitionRef = recognition;
@@ -273,6 +289,33 @@
         } catch (e: any) {
             error = "No se pudo iniciar el reconocimiento de voz.";
         }
+    };
+
+    const mergeIncrementalTranscript = (
+        current: string,
+        incoming: string,
+    ): string => {
+        if (!current) return incoming;
+
+        if (incoming.startsWith(current)) {
+            return incoming;
+        }
+
+        if (!current.includes(incoming)) {
+            return `${current} ${incoming}`;
+        }
+
+        return current;
+    };
+
+    const normalizeResults = (results: SpeechRecognitionResultList) => {
+        return Array.from(results).map((result) =>
+            Array.from(result).map((alternative) => ({
+                transcript: alternative.transcript.trim(),
+                confidence: alternative.confidence,
+                isFinal: result.isFinal,
+            })),
+        );
     };
 
     const getStatusColor = (status: PermissionStatusState) => {
