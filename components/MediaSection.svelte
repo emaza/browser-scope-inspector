@@ -220,6 +220,22 @@
         else startMicrophone();
     };
 
+    // const mergeTranscripts = (data: any[]) => {
+    //     let result = "";
+
+    //     for (const [{ transcript }] of data) {
+    //         const text = transcript.trim();
+    //         if (!text) continue;
+
+    //         if (text.startsWith(result)) {
+    //             result = text;
+    //         } else if (!result.includes(text)) {
+    //             result += " " + text;
+    //         }
+    //     }
+    //     return result;
+    // };
+
     const toggleTranscription = () => {
         if (isTranscribing) {
             if (recognitionRef) recognitionRef.stop();
@@ -270,9 +286,17 @@
                         const text = results[i].transcript;
                         if (results[i].isFinal && results[i].confidence > 0) {
                             finalTrans += text;
-                            interimTrans = ""
+                            interimTrans = "";
                         } else {
-                            interimTrans += text;
+                            // interimTrans = mergeTranscripts(text);
+                            // const text = transcript.trim();
+                            if (!text) continue;
+
+                            if (text.startsWith(interimTrans)) {
+                                interimTrans = text;
+                            } else if (!interimTrans.includes(text)) {
+                                interimTrans += " " + text;
+                            }
                         }
                     }
                 });
