@@ -262,15 +262,19 @@
                     })),
                 );
 
+                console.log(event);
                 console.log(JSON.stringify(resultsArray, null, 2));
-                for (let i = 0; i < event.results.length; i++) {
-                    const text = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTrans += text;
-                    } else {
-                        interimTrans += text;
+                resultsArray.forEach((results) => {
+                    console.log(results);
+                    for (let i = 0; i < results.length; i++) {
+                        const text = results[i].transcript;
+                        if (results[i].isFinal && results[i].confidence > 0) {
+                            finalTrans += text;
+                        } else {
+                            interimTrans += text;
+                        }
                     }
-                }
+                });
                 transcript =
                     finalTrans + (interimTrans ? ` [${interimTrans}]` : "");
             };
