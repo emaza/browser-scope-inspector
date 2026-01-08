@@ -233,22 +233,28 @@ const MediaSection: React.FC = () => {
         };
 
         recognition.onresult = (event: any) => {
-            let finalTrans = '';
-            let interimTrans = '';
+          let interimTranscript = '';
 
-            // This API returns a list of results, we need to reconstruct the full string
-            // or just append. Because we use continuous=true, we iterate all.
-            for (let i = 0; i < event.results.length; i++) {
-                const text = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTrans += text;
-                } else {
-                    interimTrans += text;
-                }
+          // Reiniciamos el acumulador final para esta ráfaga de resultados
+          // pero solo recorremos los resultados del evento actual
+          let currentFinal = '';
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              currentFinal += transcript;
+            } else {
+              interimTranscript += transcript;
             }
-            // A simplified way to display continuous history + current interim
-            // Note: In a production app you might manage history differently to avoid reprocessing everything.
-            setTranscript(finalTrans + (interimTrans ? ` [${interimTrans}]` : ''));
+          }
+
+          // Actualizamos el estado.
+          // Usamos una función de actualización para asegurarnos de no perder texto previo
+          setTranscript(prev => {
+            // Si hay texto final nuevo, lo añadimos al historial previo
+            const updatedFinal = currentFinal ? (prev.replace(/\[.*\]$/, '') + currentFinal) : prev.replace(/\[.*\]$/, '');
+            return updatedFinal + (interimTranscript ? ` [${interimTranscript}]` : '');
+          });
         };
 
         recognitionRef.current = recognition;
