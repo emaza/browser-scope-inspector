@@ -387,172 +387,172 @@
                     {/if}
                 </div>
             {/if}
+        </div>
 
-            <!-- Mic Status -->
-            <div class="p-3 bg-slate-900/40 rounded border border-slate-800">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <Mic size={18} class="text-slate-400" />
-                        <div>
-                            <div class="text-sm font-medium text-slate-200">
-                                Micrófono
-                            </div>
-                            <div
-                                class="text-xs {getStatusColor(
-                                    micStatus,
-                                )} font-mono uppercase"
-                            >
-                                {getStatusLabel(micStatus)}
-                            </div>
+        <!-- Mic Status -->
+        <div class="p-3 bg-slate-900/40 rounded border border-slate-800">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <Mic size={18} class="text-slate-400" />
+                    <div>
+                        <div class="text-sm font-medium text-slate-200">
+                            Micrófono
                         </div>
-                    </div>
-                    {#if micStatus !== "granted"}
-                        <button
-                            onclick={() => requestMedia("audio")}
-                            class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
+                        <div
+                            class="text-xs {getStatusColor(
+                                micStatus,
+                            )} font-mono uppercase"
                         >
-                            Solicitar Acceso
-                        </button>
-                    {/if}
-                </div>
-
-                {#if micStatus === "granted"}
-                    <div class="space-y-4">
-                        <!-- Visualizer UI -->
-                        <div class="mt-3 pt-3 border-t border-slate-700/50">
-                            <div class="flex items-center justify-between mb-2">
-                                <div
-                                    class="flex items-center gap-2 text-xs text-slate-400"
-                                >
-                                    <Volume2 size={14} />
-                                    <span>Prueba de Entrada</span>
-                                </div>
-                                <button
-                                    onclick={handleMicToggle}
-                                    class="flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors {isListening
-                                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                        : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'}"
-                                >
-                                    {#if isListening}
-                                        <Square size={10} fill="currentColor" />
-                                        Detener
-                                    {:else}
-                                        <Play size={10} fill="currentColor" /> Escuchar
-                                    {/if}
-                                </button>
-                            </div>
-
-                            <!-- Volume Bar -->
-                            <div
-                                class="h-2 bg-slate-800 rounded-full overflow-hidden flex items-center"
-                            >
-                                <div
-                                    class="h-full transition-all duration-75 ease-out rounded-full {volume >
-                                    80
-                                        ? 'bg-red-500'
-                                        : volume > 50
-                                          ? 'bg-yellow-400'
-                                          : 'bg-emerald-500'}"
-                                    style="width: {Math.max(
-                                        2,
-                                        volume,
-                                    )}%; opacity: {isListening ? 1 : 0.3}"
-                                ></div>
-                            </div>
-                        </div>
-
-                        <!-- Speech Recognition UI -->
-                        <div class="pt-3 border-t border-slate-700/50">
-                            <div class="flex items-center justify-between mb-2">
-                                <div
-                                    class="flex items-center gap-2 text-xs text-slate-400"
-                                >
-                                    <MessageSquare size={14} />
-                                    <span>Transcripción (Speech-to-Text)</span>
-                                </div>
-                                <button
-                                    onclick={toggleTranscription}
-                                    class="flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors {isTranscribing
-                                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                        : 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30'}"
-                                >
-                                    {#if isTranscribing}
-                                        <Square size={10} fill="currentColor" />
-                                        Detener Rec.
-                                    {:else}
-                                        <Mic size={10} fill="currentColor" /> Iniciar
-                                        Rec.
-                                    {/if}
-                                </button>
-                            </div>
-
-                            <div class="relative">
-                                <textarea
-                                    value={transcript}
-                                    readonly
-                                    placeholder={isTranscribing
-                                        ? "Escuchando... (habla ahora)"
-                                        : "El texto transcrito aparecerá aquí..."}
-                                    class="w-full h-24 bg-black/30 border {isTranscribing
-                                        ? 'border-indigo-500/50'
-                                        : 'border-slate-700'} rounded p-2 text-xs text-slate-300 font-mono resize-none focus:outline-none transition-colors"
-                                ></textarea>
-                                {#if transcript}
-                                    <button
-                                        onclick={() => (transcript = "")}
-                                        class="absolute bottom-2 right-2 p-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-400 transition-colors"
-                                        title="Borrar texto"
-                                    >
-                                        <Trash2 size={12} />
-                                    </button>
-                                {/if}
-                            </div>
+                            {getStatusLabel(micStatus)}
                         </div>
                     </div>
+                </div>
+                {#if micStatus !== "granted"}
+                    <button
+                        onclick={() => requestMedia("audio")}
+                        class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
+                    >
+                        Solicitar Acceso
+                    </button>
                 {/if}
             </div>
 
-            {#if error}
-                <div
-                    class="text-xs text-red-400 bg-red-400/10 p-2 rounded border border-red-400/20 flex items-center gap-2"
-                >
-                    <AlertCircle size={14} />
-                    {error}
-                </div>
-            {/if}
+            {#if micStatus === "granted"}
+                <div class="space-y-4">
+                    <!-- Visualizer UI -->
+                    <div class="mt-3 pt-3 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between mb-2">
+                            <div
+                                class="flex items-center gap-2 text-xs text-slate-400"
+                            >
+                                <Volume2 size={14} />
+                                <span>Prueba de Entrada</span>
+                            </div>
+                            <button
+                                onclick={handleMicToggle}
+                                class="flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors {isListening
+                                    ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                                    : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'}"
+                            >
+                                {#if isListening}
+                                    <Square size={10} fill="currentColor" />
+                                    Detener
+                                {:else}
+                                    <Play size={10} fill="currentColor" /> Escuchar
+                                {/if}
+                            </button>
+                        </div>
 
-            {#if camStatus === "granted" || micStatus === "granted"}
-                <div class="mt-4 pt-3 border-t border-slate-700/50">
-                    <h4
-                        class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider"
-                    >
-                        Dispositivos Detectados
-                    </h4>
-                    {#if devices.length > 0}
-                        <ul class="space-y-1.5">
-                            {#each devices as device, idx}
-                                <li
-                                    class="text-xs text-slate-300 flex items-center gap-2 truncate"
+                        <!-- Volume Bar -->
+                        <div
+                            class="h-2 bg-slate-800 rounded-full overflow-hidden flex items-center"
+                        >
+                            <div
+                                class="h-full transition-all duration-75 ease-out rounded-full {volume >
+                                80
+                                    ? 'bg-red-500'
+                                    : volume > 50
+                                      ? 'bg-yellow-400'
+                                      : 'bg-emerald-500'}"
+                                style="width: {Math.max(
+                                    2,
+                                    volume,
+                                )}%; opacity: {isListening ? 1 : 0.3}"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Speech Recognition UI -->
+                    <div class="pt-3 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between mb-2">
+                            <div
+                                class="flex items-center gap-2 text-xs text-slate-400"
+                            >
+                                <MessageSquare size={14} />
+                                <span>Transcripción (Speech-to-Text)</span>
+                            </div>
+                            <button
+                                onclick={toggleTranscription}
+                                class="flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-1 rounded transition-colors {isTranscribing
+                                    ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                                    : 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30'}"
+                            >
+                                {#if isTranscribing}
+                                    <Square size={10} fill="currentColor" />
+                                    Detener Rec.
+                                {:else}
+                                    <Mic size={10} fill="currentColor" /> Iniciar
+                                    Rec.
+                                {/if}
+                            </button>
+                        </div>
+
+                        <div class="relative">
+                            <textarea
+                                value={transcript}
+                                readonly
+                                placeholder={isTranscribing
+                                    ? "Escuchando... (habla ahora)"
+                                    : "El texto transcrito aparecerá aquí..."}
+                                class="w-full h-24 bg-black/30 border {isTranscribing
+                                    ? 'border-indigo-500/50'
+                                    : 'border-slate-700'} rounded p-2 text-xs text-slate-300 font-mono resize-none focus:outline-none transition-colors"
+                            ></textarea>
+                            {#if transcript}
+                                <button
+                                    onclick={() => (transcript = "")}
+                                    class="absolute bottom-2 right-2 p-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-400 transition-colors"
+                                    title="Borrar texto"
                                 >
-                                    {#if device.kind === "videoinput"}
-                                        <Video size={12} class="shrink-0" />
-                                    {:else}
-                                        <Mic size={12} class="shrink-0" />
-                                    {/if}
-                                    <span class="truncate"
-                                        >{device.label ||
-                                            "Dispositivo desconocido (etiqueta oculta)"}</span
-                                    >
-                                </li>
-                            {/each}
-                        </ul>
-                    {:else}
-                        <p class="text-xs text-slate-500 italic">
-                            No se detectaron dispositivos.
-                        </p>
-                    {/if}
+                                    <Trash2 size={12} />
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
                 </div>
             {/if}
         </div>
+
+        {#if error}
+            <div
+                class="text-xs text-red-400 bg-red-400/10 p-2 rounded border border-red-400/20 flex items-center gap-2"
+            >
+                <AlertCircle size={14} />
+                {error}
+            </div>
+        {/if}
+
+        {#if camStatus === "granted" || micStatus === "granted"}
+            <div class="mt-4 pt-3 border-t border-slate-700/50">
+                <h4
+                    class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider"
+                >
+                    Dispositivos Detectados
+                </h4>
+                {#if devices.length > 0}
+                    <ul class="space-y-1.5">
+                        {#each devices as device, idx}
+                            <li
+                                class="text-xs text-slate-300 flex items-center gap-2 truncate"
+                            >
+                                {#if device.kind === "videoinput"}
+                                    <Video size={12} class="shrink-0" />
+                                {:else}
+                                    <Mic size={12} class="shrink-0" />
+                                {/if}
+                                <span class="truncate"
+                                    >{device.label ||
+                                        "Dispositivo desconocido (etiqueta oculta)"}</span
+                                >
+                            </li>
+                        {/each}
+                    </ul>
+                {:else}
+                    <p class="text-xs text-slate-500 italic">
+                        No se detectaron dispositivos.
+                    </p>
+                {/if}
+            </div>
+        {/if}
     </div></Card
 >
