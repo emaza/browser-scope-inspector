@@ -1,14 +1,13 @@
-/** @jsx React.createElement */
-/** @jsxFrag React.Fragment */
-import React, { useEffect, useState } from 'react';
-import { Fingerprint, Database, Check, X } from 'lucide-react';
-import { Card, DataRow } from './Card';
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { Fingerprint, Database, Check, X } from 'lucide-svelte';
+  import Card from './Card.svelte';
+  import DataRow from './DataRow.svelte';
 
-const FingerprintSection: React.FC = () => {
-  const [canvasHash, setCanvasHash] = useState<string>('Calculando...');
-  const [audioHash, setAudioHash] = useState<string>('Calculando...');
-  const [fonts, setFonts] = useState<string[]>([]);
-  const [capabilities, setCapabilities] = useState<Record<string, boolean>>({});
+  let canvasHash = $state('Calculando...');
+  let audioHash = $state('Calculando...');
+  let fonts = $state<string[]>([]);
+  let capabilities = $state<Record<string, boolean>>({});
 
   // Simple hashing function for demo
   const cyrb53 = (str: string, seed = 0) => {
@@ -23,7 +22,7 @@ const FingerprintSection: React.FC = () => {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
   };
 
-  useEffect(() => {
+  onMount(() => {
     // 1. Canvas Fingerprinting
     const generateCanvasHash = () => {
         try {
@@ -46,9 +45,9 @@ const FingerprintSection: React.FC = () => {
             
             const dataURI = canvas.toDataURL();
             const hash = cyrb53(dataURI);
-            setCanvasHash(hash.toString(16));
+            canvasHash = hash.toString(16);
         } catch (e) {
-            setCanvasHash('Error');
+            canvasHash = 'Error';
         }
     };
 
@@ -57,7 +56,6 @@ const FingerprintSection: React.FC = () => {
         const fontList = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'Roboto', 'Lato', 'Open Sans', 'Fira Code', 'Comic Sans MS', 'Impact'];
         const detected: string[] = [];
         
-        // Basic logic: compare width of string in specific font vs fallback
         const baseFonts = ['monospace', 'sans-serif', 'serif'];
         const testString = "mmmmmmmmmmlli";
         
@@ -90,16 +88,16 @@ const FingerprintSection: React.FC = () => {
             if (present) detected.push(font);
         }
         document.body.removeChild(span);
-        setFonts(detected);
+        fonts = detected;
     };
 
     // 3. Audio Fingerprinting
     const generateAudioHash = async () => {
         try {
-            // @ts-ignore - Webkit prefix handling
+            // @ts-ignore
             const AudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
             if (!AudioContext) {
-                setAudioHash("No Soportado");
+                audioHash = "No Soportado";
                 return;
             }
             
@@ -122,94 +120,96 @@ const FingerprintSection: React.FC = () => {
             const buffer = await context.startRendering();
             const data = buffer.getChannelData(0);
             let hash = 0;
-            // Sample a subset for performance
             for (let i = 0; i < data.length; i+=100) {
                 hash += Math.abs(data[i]);
             }
-            setAudioHash(cyrb53(hash.toString()).toString(16));
+            audioHash = cyrb53(hash.toString()).toString(16);
             
         } catch (e) {
-            setAudioHash("Error");
+            audioHash = "Error";
         }
     };
 
     // 4. Storage & API Capabilities Detection
     const checkCapabilities = () => {
-        const caps = {
+        capabilities = {
             'Cookies': navigator.cookieEnabled,
             'LocalStorage': !!window.localStorage,
             'IndexedDB': !!window.indexedDB,
             'CacheStorage': 'caches' in window,
             'ServiceWorkers': 'serviceWorker' in navigator,
-            'WebSQL': 'openDatabase' in window, // Deprecated in most modern browsers
-            'AppCache': 'applicationCache' in window, // Deprecated
+            'WebSQL': 'openDatabase' in window,
+            'AppCache': 'applicationCache' in window, 
             'FileSystem': 'webkitRequestFileSystem' in window || 'requestFileSystem' in window,
             'Downloads': 'download' in document.createElement('a'),
             'History API': !!window.history,
             'FormData': 'FormData' in window,
             'Passwords API': 'PasswordCredential' in window || 'CredentialsContainer' in window
         };
-        setCapabilities(caps);
     };
 
     generateCanvasHash();
     detectFonts();
     generateAudioHash();
     checkCapabilities();
-  }, []);
+  });
+</script>
 
-  return (
-    <Card 
-      title="Huella Digital (Fingerprinting)" 
-      description="Técnicas de identificación pasiva sin cookies."
-      icon={<Fingerprint size={20} />}
-    >
-      <DataRow 
-        label="Canvas Hash" 
-        value={<span className="text-xs font-mono bg-slate-900 px-1 py-0.5 rounded text-amber-500">{canvasHash}</span>} 
-      />
-      <DataRow 
-        label="Audio Context Hash" 
-        value={<span className="text-xs font-mono bg-slate-900 px-1 py-0.5 rounded text-amber-500">{audioHash}</span>} 
-      />
-      
-      {/* Fonts Section */}
-      <div className="mt-3">
-        <span className="text-slate-400 font-medium text-sm">Fuentes Detectadas (Muestra):</span>
-        <div className="flex flex-wrap gap-1 mt-2 mb-4">
-            {fonts.map(f => (
-                <span key={f} className="px-2 py-1 bg-slate-700 text-slate-200 text-xs rounded-full border border-slate-600">
-                    {f}
-                </span>
-            ))}
-            {fonts.length === 0 && <span className="text-xs text-slate-500">Analizando...</span>}
-        </div>
+<Card 
+  title="Huella Digital (Fingerprinting)" 
+  description="Técnicas de identificación pasiva sin cookies."
+>
+  {#snippet icon()}
+    <Fingerprint size={20} />
+  {/snippet}
+
+  <DataRow label="Canvas Hash">
+    {#snippet value()}
+        <span class="text-xs font-mono bg-slate-900 px-1 py-0.5 rounded text-amber-500">{canvasHash}</span>
+    {/snippet}
+  </DataRow>
+
+  <DataRow label="Audio Context Hash">
+    {#snippet value()}
+        <span class="text-xs font-mono bg-slate-900 px-1 py-0.5 rounded text-amber-500">{audioHash}</span>
+    {/snippet}
+  </DataRow>
+  
+  <!-- Fonts Section -->
+  <div class="mt-3">
+    <span class="text-slate-400 font-medium text-sm">Fuentes Detectadas (Muestra):</span>
+    <div class="flex flex-wrap gap-1 mt-2 mb-4">
+        {#each fonts as f}
+            <span class="px-2 py-1 bg-slate-700 text-slate-200 text-xs rounded-full border border-slate-600">
+                {f}
+            </span>
+        {/each}
+        {#if fonts.length === 0}
+            <span class="text-xs text-slate-500">Analizando...</span>
+        {/if}
+    </div>
+  </div>
+
+  <!-- Capabilities Section -->
+  <div class="mt-4 pt-3 border-t border-slate-700/50">
+      <h4 class="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+         <Database size={12} /> APIs y Almacenamiento
+      </h4>
+      <div class="grid grid-cols-2 gap-2">
+          {#each Object.entries(capabilities) as [key, supported]}
+              <div class="flex items-center justify-between bg-slate-900/40 px-2 py-1.5 rounded border border-slate-800">
+                  <span class="text-xs text-slate-300">{key}</span>
+                  {#if supported}
+                      <div class="flex items-center gap-1 text-[10px] text-green-400 font-bold uppercase">
+                          <Check size={10} strokeWidth={4} /> Sí
+                      </div>
+                  {:else}
+                      <div class="flex items-center gap-1 text-[10px] text-slate-600 font-bold uppercase">
+                          <X size={10} strokeWidth={4} /> No
+                      </div>
+                  {/if}
+              </div>
+          {/each}
       </div>
-
-      {/* Capabilities Section */}
-      <div className="mt-4 pt-3 border-t border-slate-700/50">
-          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-             <Database size={12} /> APIs y Almacenamiento
-          </h4>
-          <div className="grid grid-cols-2 gap-2">
-              {Object.entries(capabilities).map(([key, supported]) => (
-                  <div key={key} className="flex items-center justify-between bg-slate-900/40 px-2 py-1.5 rounded border border-slate-800">
-                      <span className="text-xs text-slate-300">{key}</span>
-                      {supported ? (
-                          <div className="flex items-center gap-1 text-[10px] text-green-400 font-bold uppercase">
-                              <Check size={10} strokeWidth={4} /> Sí
-                          </div>
-                      ) : (
-                          <div className="flex items-center gap-1 text-[10px] text-slate-600 font-bold uppercase">
-                              <X size={10} strokeWidth={4} /> No
-                          </div>
-                      )}
-                  </div>
-              ))}
-          </div>
-      </div>
-    </Card>
-  );
-};
-
-export default FingerprintSection;
+  </div>
+</Card>
