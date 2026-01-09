@@ -2,8 +2,11 @@
   import { MapPin, Navigation, AlertTriangle, RefreshCw } from 'lucide-svelte';
   import Card from './Card.svelte';
   import DataRow from './DataRow.svelte';
+  import InfoModal from './InfoModal.svelte';
 
   let location = $state<{lat: number, lon: number, acc: number} | null>(null);
+  let fullPosition = $state<GeolocationPosition | null>(null);
+  let isModalOpen = $state(false);
   let error = $state<string | null>(null);
   let loading = $state(false);
   let retryMode = $state(false);
@@ -20,6 +23,7 @@
     }
 
     const handleSuccess = (pos: GeolocationPosition) => {
+      fullPosition = pos;
       location = {
         lat: pos.coords.latitude,
         lon: pos.coords.longitude,
@@ -105,7 +109,13 @@
     <DataRow label="Latitud" value={location.lat.toFixed(6)} highlight />
     <DataRow label="Longitud" value={location.lon.toFixed(6)} highlight />
     <DataRow label="Precisión" value={`±${location.acc.toFixed(0)} m`} />
-    <div class="mt-4 pt-3 border-t border-slate-700/50">
+    <div class="mt-4 pt-3 border-t border-slate-700/50 space-y-2">
+        <button
+            onclick={() => isModalOpen = true}
+            class="flex items-center justify-center gap-2 w-full text-center bg-slate-800 hover:bg-slate-700/60 text-slate-300 hover:text-white text-xs py-2 rounded transition-colors"
+        >
+            Más datos
+        </button>
         <a 
             href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}`}
             target="_blank" 
@@ -117,3 +127,40 @@
     </div>
   {/if}
 </Card>
+
+<InfoModal
+  isOpen={isModalOpen}
+  onClose={() => isModalOpen = false}
+  title="Datos de Geolocalización"
+>
+  {#if fullPosition}
+    <div class="space-y-1.5">
+      <DataRow
+        label="Timestamp"
+        value={new Date(fullPosition.timestamp).toLocaleString()}
+      />
+      <div class="pt-3"></div>
+      <DataRow label="Latitud" value={fullPosition.coords.latitude.toFixed(6)} />
+      <DataRow label="Longitud" value={fullPosition.coords.longitude.toFixed(6)} />
+      <DataRow label="Precisión" value={`±${fullPosition.coords.accuracy.toFixed(0)} m`} />
+      <DataRow
+        label="Altitud"
+        value={fullPosition.coords.altitude !== null ? `${fullPosition.coords.altitude.toFixed(0)} m` : 'No disponible'}
+      />
+      <DataRow
+        label="Precisión de Altitud"
+        value={fullPosition.coords.altitudeAccuracy !== null ? `±${fullPosition.coords.altitudeAccuracy.toFixed(0)} m` : 'No disponible'}
+      />
+      <DataRow
+        label="Rumbo"
+        value={fullPosition.coords.heading !== null ? `${fullPosition.coords.heading.toFixed(0)}°` : 'No disponible'}
+      />
+      <DataRow
+        label="Velocidad"
+        value={fullPosition.coords.speed !== null ? `${fullPosition.coords.speed.toFixed(2)} m/s` : 'No disponible'}
+      />
+    </div>
+  {:else}
+    <p>No hay datos de posición disponibles.</p>
+  {/if}
+</InfoModal>
