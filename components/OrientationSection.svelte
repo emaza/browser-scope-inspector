@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Zap, AlertTriangle } from 'lucide-svelte';
-  import { ondestroy } from 'svelte';
+  import { $state, $effect } from 'svelte/reactivity';
   import Card from './Card.svelte';
   import DataRow from './DataRow.svelte';
 
@@ -50,10 +50,12 @@
     }
   };
 
-  ondestroy(() => {
-    if (listening) {
-      window.removeEventListener('devicemotion', handleMotionEvent);
-    }
+  $effect(() => {
+    return () => {
+      if (listening) {
+        window.removeEventListener('devicemotion', handleMotionEvent);
+      }
+    };
   });
 </script>
 
