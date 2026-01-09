@@ -26,13 +26,21 @@ jobs:
         run: npm ci
 
       - name: Determine Bump Type
-        id: bump
         run: |
+          # Obtenemos el mensaje completo (título y descripción de la PR)
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          if [[ "$COMMIT_MSG" =~ ^feat(\(.*\))?:\ .* ]]; then
+          echo "Analizando mensaje: $COMMIT_MSG"
+          
+          # Usamos grep -E para buscar el patrón en cualquier parte del mensaje
+          if echo "$COMMIT_MSG" | grep -Eq "feat(\(.*\))?:"; then
             echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Resultado: Detectado MINOR"
+          elif echo "$COMMIT_MSG" | grep -Eq "fix(\(.*\))?:"; then
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Resultado: Detectado PATCH (fix)"
           else
             echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Resultado: Default PATCH"
           fi
 
       - name: Create Version Branch and PR
