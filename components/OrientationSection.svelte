@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Zap, AlertTriangle } from 'lucide-svelte';
-  import { $state, $effect } from 'svelte/reactivity';
   import Card from './Card.svelte';
   import DataRow from './DataRow.svelte';
 
