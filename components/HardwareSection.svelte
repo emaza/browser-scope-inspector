@@ -11,6 +11,20 @@
 
   $effect(() => {
     let batteryManager: BatteryManager | null = null;
+    let isMounted = true;
+
+    try {
+      nav.getBattery().then((batt: BatteryManager) => {
+        if (!isMounted) return;
+        batteryManager = batt;
+        updateBattery();
+
+        batt.addEventListener("levelchange", updateBattery);
+        batt.addEventListener("chargingchange", updateBattery);
+      });
+    } catch (error) {
+      console.error("Battery API not supported", error);
+    }
 
     const updateBattery = () => {
       if (batteryManager) {
@@ -20,16 +34,6 @@
         };
       }
     };
-
-    if (nav.getBattery) {
-      nav.getBattery().then((batt: BatteryManager) => {
-        batteryManager = batt;
-        updateBattery();
-
-        batt.addEventListener("levelchange", updateBattery);
-        batt.addEventListener("chargingchange", updateBattery);
-      });
-    }
 
     try {
       const canvas = document.createElement("canvas");
@@ -47,6 +51,7 @@
     }
 
     return () => {
+      isMounted = false;
       if (batteryManager) {
         batteryManager.removeEventListener("levelchange", updateBattery);
         batteryManager.removeEventListener("chargingchange", updateBattery);

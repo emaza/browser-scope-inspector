@@ -3,7 +3,7 @@ export interface ExtendedNavigator extends Navigator {
   connection?: NetworkInformation;
   mozConnection?: NetworkInformation;
   webkitConnection?: NetworkInformation;
-  getBattery?: () => Promise<BatteryManager>;
+  getBattery: () => Promise<BatteryManager>;
 }
 
 export interface BatteryManager extends EventTarget {
