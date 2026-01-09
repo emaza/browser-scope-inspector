@@ -11,6 +11,8 @@
   const nav = navigator as ExtendedNavigator;
 
   onMount(() => {
+    let dispose = () => {};
+
     // Battery API
     if (nav.getBattery) {
       nav.getBattery().then((batt: BatteryManager) => {
@@ -23,6 +25,10 @@
         updateBattery();
         batt.addEventListener('levelchange', updateBattery);
         batt.addEventListener('chargingchange', updateBattery);
+        dispose = () => {
+          batt.removeEventListener('levelchange', updateBattery);
+          batt.removeEventListener('chargingchange', updateBattery);
+        };
       });
     }
 
@@ -41,6 +47,8 @@
     } catch (e) {
       console.error("WebGL GPU detection failed", e);
     }
+
+    return () => dispose();
   });
 </script>
 
