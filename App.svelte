@@ -14,6 +14,7 @@
     import MediaSection from "./components/MediaSection.svelte";
     import ClipboardSection from "./components/ClipboardSection.svelte";
     import NotificationSection from "./components/NotificationSection.svelte";
+    import OrientationSection from "./components/OrientationSection.svelte";
 </script>
 
 <div
@@ -97,6 +98,7 @@
             <FingerprintSection />
             <PreferencesSection />
             <BehaviorSection />
+            <OrientationSection />
         </main>
 
         <!-- Footer -->
