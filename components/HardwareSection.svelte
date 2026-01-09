@@ -1,89 +1,91 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { Cpu, Battery, BatteryCharging } from 'lucide-svelte';
-  import Card from './Card.svelte';
-  import DataRow from './DataRow.svelte';
-  import type { ExtendedNavigator, BatteryManager } from '../types';
+  import { Cpu, Battery, BatteryCharging } from "lucide-svelte";
+  import Card from "./Card.svelte";
+  import DataRow from "./DataRow.svelte";
+  import type { ExtendedNavigator, BatteryManager } from "../types";
 
   let battery = $state<{ level: number; charging: boolean } | null>(null);
-  let gpu = $state('Desconocida');
+  let gpu = $state("Desconocida");
 
   const nav = navigator as ExtendedNavigator;
 
-  onMount(() => {
-    let dispose = () => {};
+  $effect(() => {
+    let batteryManager: BatteryManager | null = null;
 
-    // Battery API
+    const updateBattery = () => {
+      if (batteryManager) {
+        battery = {
+          level: batteryManager.level,
+          charging: batteryManager.charging,
+        };
+      }
+    };
+
     if (nav.getBattery) {
       nav.getBattery().then((batt: BatteryManager) => {
-        const updateBattery = () => {
-          battery = {
-            level: batt.level,
-            charging: batt.charging
-          };
-        };
+        batteryManager = batt;
         updateBattery();
-        batt.addEventListener('levelchange', updateBattery);
-        batt.addEventListener('chargingchange', updateBattery);
-        dispose = () => {
-          batt.removeEventListener('levelchange', updateBattery);
-          batt.removeEventListener('chargingchange', updateBattery);
-        };
+
+        batt.addEventListener("levelchange", updateBattery);
+        batt.addEventListener("chargingchange", updateBattery);
       });
     }
 
-    // GPU Info via WebGL
     try {
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      const canvas = document.createElement("canvas");
+      const gl =
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
       if (gl) {
         const ctx = gl as WebGLRenderingContext;
-        const debugInfo = ctx.getExtension('WEBGL_debug_renderer_info');
+        const debugInfo = ctx.getExtension("WEBGL_debug_renderer_info");
         if (debugInfo) {
-          const renderer = ctx.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-          gpu = renderer;
+          gpu = ctx.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         }
       }
     } catch (e) {
       console.error("WebGL GPU detection failed", e);
     }
 
-    return () => dispose();
+    return () => {
+      if (batteryManager) {
+        batteryManager.removeEventListener("levelchange", updateBattery);
+        batteryManager.removeEventListener("chargingchange", updateBattery);
+      }
+    };
   });
 </script>
 
-<Card 
-  title="Hardware (Capa Física)" 
+<Card
+  title="Hardware (Capa Física)"
   description="Especificaciones técnicas expuestas por el navegador."
 >
   {#snippet icon()}
     <Cpu size={20} />
   {/snippet}
 
-  <DataRow 
-    label="Núcleos de CPU" 
-    value={nav.hardwareConcurrency ? `${nav.hardwareConcurrency} Hilos Lógicos` : 'No disponible'} 
+  <DataRow
+    label="Núcleos de CPU"
+    value={nav.hardwareConcurrency
+      ? `${nav.hardwareConcurrency} Hilos Lógicos`
+      : "No disponible"}
   />
-  <DataRow 
-    label="Memoria RAM (Aprox.)" 
-    value={nav.deviceMemory ? `~${nav.deviceMemory} GB` : 'No disponible'} 
+  <DataRow
+    label="Memoria RAM (Aprox.)"
+    value={nav.deviceMemory ? `~${nav.deviceMemory} GB` : "No disponible"}
     highlight
   />
-  <DataRow 
-    label="GPU / Renderizador" 
-    value={gpu} 
-  />
-  
+  <DataRow label="GPU / Renderizador" value={gpu} />
+
   <DataRow label="Batería">
     {#snippet value()}
       {#if battery}
         <div class="flex items-center gap-2 justify-end">
           <span>{(battery.level * 100).toFixed(0)}%</span>
-            {#if battery.charging}
-               <BatteryCharging size={16} class="text-green-400" />
-            {:else}
-               <Battery size={16} class="text-yellow-400" />
-            {/if}
+          {#if battery.charging}
+            <BatteryCharging size={16} class="text-green-400" />
+          {:else}
+            <Battery size={16} class="text-yellow-400" />
+          {/if}
         </div>
       {:else}
         API no soportada / Bloqueada
@@ -91,8 +93,5 @@
     {/snippet}
   </DataRow>
 
-  <DataRow 
-    label="Plataforma" 
-    value={nav.platform} 
-  />
+  <DataRow label="Plataforma" value={nav.platform} />
 </Card>
