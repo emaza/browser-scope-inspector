@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+    declare const __APP_VERSION__: string;
+</script>
+
 <script lang="ts">
     import { ShieldCheck, Eye, Info, Github } from "lucide-svelte";
     import HardwareSection from "./components/HardwareSection.svelte";
@@ -98,6 +102,9 @@
         <!-- Footer -->
         <footer class="pt-12 text-center text-slate-600 text-xs">
             <p class="mb-2">Svelte + TypeScript + Tailwind</p>
+            <p>
+                Version {__APP_VERSION__}
+            </p>
             <p>
                 &copy; {new Date().getFullYear()} Browser Scope Demo. Only for educational
                 purposes.
