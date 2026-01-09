@@ -16,6 +16,10 @@
   });
 
   let hasFocus = $state(document.hasFocus());
+  let orientation = $state({
+    type: screen.orientation.type,
+    angle: screen.orientation.angle
+  });
 
   onMount(() => {
     const handleResize = () => {
@@ -33,15 +37,21 @@
 
     const onFocus = () => hasFocus = true;
     const onBlur = () => hasFocus = false;
+    const handleOrientationChange = () => {
+      orientation.type = screen.orientation.type;
+      orientation.angle = screen.orientation.angle;
+    };
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
+    screen.orientation.addEventListener('change', handleOrientationChange);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('blur', onBlur);
+      screen.orientation.removeEventListener('change', handleOrientationChange);
     };
   });
 
@@ -91,7 +101,12 @@
      </span>
   </div>
 
-  <div class="mt-2 p-2 bg-slate-900/50 rounded text-xs text-center border border-dashed border-slate-700">
-    Orientación: {screen.orientation ? screen.orientation.type : 'Desconocida'}
-  </div>
+  <DataRow
+    label="Orientación (Tipo)"
+    value={orientation.type}
+  />
+  <DataRow
+    label="Orientación (Ángulo)"
+    value={`${orientation.angle}°`}
+  />
 </Card>
