@@ -26,6 +26,7 @@ jobs:
         run: npm ci
 
       - name: Determine Bump Type
+        id: bump
         run: |
           # Obtenemos el mensaje completo (título y descripción de la PR)
           COMMIT_MSG=$(git log -1 --pretty=%B)
