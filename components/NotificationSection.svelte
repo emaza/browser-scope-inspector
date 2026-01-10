@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Bell, BellRing, BellOff, Clock, Zap } from "lucide-svelte";
+  import { Bell, Megaphone, MegaphoneOff, RefreshCw } from "lucide-svelte";
   import Card from "./Card.svelte";
+  import Button from "./Button.svelte";
 
   let permission = $state<NotificationPermission>("default");
   let isDelayed = $state(false);
+  let loading = $state(false);
 
   onMount(() => {
     if ("Notification" in window) {
@@ -17,8 +19,10 @@
       alert("Tu navegador no soporta notificaciones.");
       return;
     }
+    loading = true;
     const result = await Notification.requestPermission();
     permission = result;
+    loading = false;
   };
 
   const sendNotification = (delayed = false) => {
@@ -91,34 +95,32 @@
     <!-- Actions -->
     <div class="grid grid-cols-1 gap-3">
       {#if permission === "default"}
-        <button
-          onclick={requestPermission}
-          class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded flex items-center justify-center gap-2 transition-colors"
-        >
-          <BellRing size={14} /> Solicitar Permiso
-        </button>
+        <Button
+          on:click={requestPermission}
+          class="w-full"
+          disabled={loading}
+          text={loading ? "Solicitando..." : "Activar notificaciones"}
+          icon={loading ? RefreshCw : Megaphone}
+        />
       {/if}
 
       {#if permission === "granted"}
-        <button
-          onclick={() => sendNotification(false)}
-          class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 text-xs font-bold rounded flex items-center justify-center gap-2 transition-all"
-        >
-          <Zap size={14} class="text-yellow-400" /> Enviar Ahora
-        </button>
+        <Button
+          text="Enviar Ahora"
+          icon={Megaphone}
+          on:click={() => sendNotification(false)}
+          class="w-full"
+        />
 
-        <button
-          onclick={() => sendNotification(true)}
+        <Button
+          text={isDelayed ? "Esperando 5 segundos..." : "Enviar en 5 segundos"}
+          icon={Megaphone}
+          on:click={() => sendNotification(true)}
           disabled={isDelayed}
-          class="w-full py-2.5 border text-xs font-bold rounded flex items-center justify-center gap-2 transition-all {isDelayed
-            ? 'bg-sky-500/20 border-sky-500/50 text-sky-400 cursor-wait'
-            : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'}"
-        >
-          <Clock size={14} class={isDelayed ? "animate-spin" : ""} />
-          {isDelayed
-            ? "Esperando 5 segundos..."
-            : "Enviar en 5 segundos (Cambia de tab)"}
-        </button>
+          class="w-full"
+          variant={isDelayed ? "pending" : "default"}
+          iconClass={isDelayed ? "animate-spin" : ""}
+        />
         <p class="text-[10px] text-center text-slate-500">
           Prueba el botón de "5 segundos" y cambia rápidamente a otra pestaña o
           minimiza el navegador.
@@ -130,7 +132,7 @@
           class="p-3 bg-red-900/20 border border-red-500/20 rounded text-center"
         >
           <div class="flex justify-center mb-1 text-red-400">
-            <BellOff size={20} />
+            <MegaphoneOff size={20} />
           </div>
           <p class="text-xs text-red-300">
             Has bloqueado las notificaciones. Debes habilitarlas manualmente en

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { Zap, Activity } from "lucide-svelte";
+    import { Activity, Compass } from "lucide-svelte";
     import Card from "./Card.svelte";
     import SensorVisualizerModal from "./SensorVisualizerModal.svelte";
+    import Button from "./Button.svelte";
 
     let permissionGranted = $state(false);
     let isSupported = $state(true); // Default to true, verify on mount
@@ -133,7 +133,7 @@
     class="col-span-1 md:col-span-2 lg:col-span-3"
 >
     {#snippet icon()}
-        <Zap size={20} />
+        <Compass size={20} />
     {/snippet}
 
     {#if !permissionGranted}
@@ -161,12 +161,11 @@
                         {errorMessage}
                     </div>
                 {/if}
-                <button
-                    onclick={toggleSensorPermission}
-                    class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-sky-900/20"
-                >
-                    Activar Sensores
-                </button>
+                <Button
+                    text="Activar Sensores"
+                    icon={Compass}
+                    on:click={toggleSensorPermission}
+                />
             {/if}
         </div>
     {:else}
@@ -336,13 +335,11 @@
                     >
                 </div>
 
-                <button
-                    onclick={openModal}
-                    class="flex items-center gap-2 text-xs bg-slate-800 hover:bg-slate-700 text-sky-400 px-3 py-1.5 rounded transition-colors border border-slate-700"
-                >
-                    <Activity size={14} />
-                    Ver demostración visual
-                </button>
+                <Button
+                    text="Ver demostración visual"
+                    icon={Activity}
+                    on:click={openModal}
+                />
             </div>
         </div>
     {/if}

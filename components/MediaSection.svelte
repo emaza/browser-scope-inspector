@@ -11,8 +11,10 @@
         Eye,
         MessageSquare,
         Trash2,
+        RefreshCw,
     } from "lucide-svelte";
     import Card from "./Card.svelte";
+    import Button from "./Button.svelte";
 
     type PermissionStatusState =
         | "granted"
@@ -41,6 +43,8 @@
     let recognitionRef: any = null;
 
     // Camera Preview State
+    let requestingCamera = $state(false);
+    let requestingMicrophone = $state(false);
     let isCameraActive = $state(false);
     let videoRef = $state<HTMLVideoElement | null>(null);
     let cameraStreamRef: MediaStream | null = null;
@@ -109,6 +113,8 @@
 
     const requestMedia = async (type: "video" | "audio") => {
         error = null;
+        requestingCamera = type === "video";
+        requestingMicrophone = type === "audio";
         try {
             const constraints =
                 type === "video" ? { video: true } : { audio: true };
@@ -116,17 +122,29 @@
                 await navigator.mediaDevices.getUserMedia(constraints);
             stream.getTracks().forEach((track) => track.stop());
 
-            if (type === "video")
+            if (type === "video") {
                 checkPermission("camera", (s) => (camStatus = s));
-            else checkPermission("microphone", (s) => (micStatus = s));
+                requestingCamera = false;
+            }
+
+            if (type === "audio") {
+                checkPermission("microphone", (s) => (micStatus = s));
+                requestingMicrophone = false;
+            }
             enumerateDevices();
         } catch (err: any) {
             console.error("Error requesting media", err);
             // Fixed: accessing err.name is safer
             error = `Error al solicitar ${type === "video" ? "cámara" : "micrófono"}: ${err.name || err.message}`;
-            if (type === "video")
+            if (type === "video") {
                 checkPermission("camera", (s) => (camStatus = s));
-            else checkPermission("microphone", (s) => (micStatus = s));
+                requestingCamera = false;
+            }
+
+            if (type === "audio") {
+                checkPermission("microphone", (s) => (micStatus = s));
+                requestingMicrophone = false;
+            }
         }
     };
 
@@ -375,12 +393,14 @@
                     </div>
                 </div>
                 {#if camStatus !== "granted"}
-                    <button
-                        onclick={() => requestMedia("video")}
-                        class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
-                    >
-                        Solicitar Acceso
-                    </button>
+                    <Button
+                        on:click={() => requestMedia("video")}
+                        disabled={requestingCamera}
+                        text={requestingCamera
+                            ? "Solicitando..."
+                            : "Solicitar Acceso"}
+                        icon={requestingCamera ? RefreshCw : Camera}
+                    />
                 {/if}
             </div>
 
@@ -451,12 +471,14 @@
                     </div>
                 </div>
                 {#if micStatus !== "granted"}
-                    <button
-                        onclick={() => requestMedia("audio")}
-                        class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
-                    >
-                        Solicitar Acceso
-                    </button>
+                    <Button
+                        on:click={() => requestMedia("audio")}
+                        disabled={requestingMicrophone}
+                        text={requestingMicrophone
+                            ? "Solicitando..."
+                            : "Solicitar Acceso"}
+                        icon={requestingMicrophone ? RefreshCw : Mic}
+                    />
                 {/if}
             </div>
 
