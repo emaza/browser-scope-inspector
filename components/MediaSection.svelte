@@ -43,8 +43,8 @@
     let recognitionRef: any = null;
 
     // Camera Preview State
-    let requestCamera = $state(false);
-    let requestMicrophone = $state(false);
+    let requestingCamera = $state(false);
+    let requestingMicrophone = $state(false);
     let isCameraActive = $state(false);
     let videoRef = $state<HTMLVideoElement | null>(null);
     let cameraStreamRef: MediaStream | null = null;
@@ -113,8 +113,8 @@
 
     const requestMedia = async (type: "video" | "audio") => {
         error = null;
-        requestCamera = type === "video";
-        requestMicrophone = type === "audio";
+        requestingCamera = type === "video";
+        requestingMicrophone = type === "audio";
         try {
             const constraints =
                 type === "video" ? { video: true } : { audio: true };
@@ -122,9 +122,15 @@
                 await navigator.mediaDevices.getUserMedia(constraints);
             stream.getTracks().forEach((track) => track.stop());
 
-            if (type === "video")
+            if (type === "video") {
                 checkPermission("camera", (s) => (camStatus = s));
-            else checkPermission("microphone", (s) => (micStatus = s));
+                requestingCamera = false;
+            }
+
+            if (type === "audio") {
+                checkPermission("microphone", (s) => (micStatus = s));
+                requestingMicrophone = false;
+            }
             enumerateDevices();
         } catch (err: any) {
             console.error("Error requesting media", err);
@@ -132,12 +138,12 @@
             error = `Error al solicitar ${type === "video" ? "cámara" : "micrófono"}: ${err.name || err.message}`;
             if (type === "video") {
                 checkPermission("camera", (s) => (camStatus = s));
-                requestCamera = false;
+                requestingCamera = false;
             }
 
             if (type === "audio") {
                 checkPermission("microphone", (s) => (micStatus = s));
-                requestMicrophone = false;
+                requestingMicrophone = false;
             }
         }
     };
@@ -389,11 +395,11 @@
                 {#if camStatus !== "granted"}
                     <Button
                         on:click={() => requestMedia("video")}
-                        disabled={requestCamera}
-                        text={requestCamera
+                        disabled={requestingCamera}
+                        text={requestingCamera
                             ? "Solicitando..."
                             : "Solicitar Acceso"}
-                        icon={requestCamera ? RefreshCw : Camera}
+                        icon={requestingCamera ? RefreshCw : Camera}
                     />
                 {/if}
             </div>
@@ -467,11 +473,11 @@
                 {#if micStatus !== "granted"}
                     <Button
                         on:click={() => requestMedia("audio")}
-                        disabled={requestMicrophone}
-                        text={requestMicrophone
+                        disabled={requestingMicrophone}
+                        text={requestingMicrophone
                             ? "Solicitando..."
                             : "Solicitar Acceso"}
-                        icon={requestMicrophone ? RefreshCw : Mic}
+                        icon={requestingMicrophone ? RefreshCw : Mic}
                     />
                 {/if}
             </div>
