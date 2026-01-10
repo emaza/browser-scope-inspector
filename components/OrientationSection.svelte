@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { Zap, Activity, Compass } from "lucide-svelte";
+    import { Activity, Compass } from "lucide-svelte";
     import Card from "./Card.svelte";
     import SensorVisualizerModal from "./SensorVisualizerModal.svelte";
     import Button from "./Button.svelte";
@@ -134,7 +133,7 @@
     class="col-span-1 md:col-span-2 lg:col-span-3"
 >
     {#snippet icon()}
-        <Zap size={20} />
+        <Compass size={20} />
     {/snippet}
 
     {#if !permissionGranted}

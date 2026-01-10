@@ -11,8 +11,10 @@
         Eye,
         MessageSquare,
         Trash2,
+        RefreshCw,
     } from "lucide-svelte";
     import Card from "./Card.svelte";
+    import Button from "./Button.svelte";
 
     type PermissionStatusState =
         | "granted"
@@ -41,6 +43,8 @@
     let recognitionRef: any = null;
 
     // Camera Preview State
+    let requestCamera = $state(false);
+    let requestMicrophone = $state(false);
     let isCameraActive = $state(false);
     let videoRef = $state<HTMLVideoElement | null>(null);
     let cameraStreamRef: MediaStream | null = null;
@@ -109,6 +113,8 @@
 
     const requestMedia = async (type: "video" | "audio") => {
         error = null;
+        requestCamera = type === "video";
+        requestMicrophone = type === "audio";
         try {
             const constraints =
                 type === "video" ? { video: true } : { audio: true };
@@ -124,9 +130,15 @@
             console.error("Error requesting media", err);
             // Fixed: accessing err.name is safer
             error = `Error al solicitar ${type === "video" ? "cámara" : "micrófono"}: ${err.name || err.message}`;
-            if (type === "video")
+            if (type === "video") {
                 checkPermission("camera", (s) => (camStatus = s));
-            else checkPermission("microphone", (s) => (micStatus = s));
+                requestCamera = false;
+            }
+
+            if (type === "audio") {
+                checkPermission("microphone", (s) => (micStatus = s));
+                requestMicrophone = false;
+            }
         }
     };
 
@@ -375,12 +387,14 @@
                     </div>
                 </div>
                 {#if camStatus !== "granted"}
-                    <button
-                        onclick={() => requestMedia("video")}
-                        class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
-                    >
-                        Solicitar Acceso
-                    </button>
+                    <Button
+                        on:click={() => requestMedia("video")}
+                        disabled={requestCamera}
+                        text={requestCamera
+                            ? "Solicitando..."
+                            : "Solicitar Acceso"}
+                        icon={requestCamera ? RefreshCw : Camera}
+                    />
                 {/if}
             </div>
 
@@ -451,12 +465,14 @@
                     </div>
                 </div>
                 {#if micStatus !== "granted"}
-                    <button
-                        onclick={() => requestMedia("audio")}
-                        class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors"
-                    >
-                        Solicitar Acceso
-                    </button>
+                    <Button
+                        on:click={() => requestMedia("audio")}
+                        disabled={requestMicrophone}
+                        text={requestMicrophone
+                            ? "Solicitando..."
+                            : "Solicitar Acceso"}
+                        icon={requestMicrophone ? RefreshCw : Mic}
+                    />
                 {/if}
             </div>
 

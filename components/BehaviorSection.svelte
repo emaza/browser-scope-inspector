@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { MousePointer2, Keyboard, Activity, RefreshCw } from "lucide-svelte";
+  import { MousePointer2, Keyboard, Activity } from "lucide-svelte";
   import Card from "./Card.svelte";
 
   let mousePos = $state({ x: 0, y: 0 });
