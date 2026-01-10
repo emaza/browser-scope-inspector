@@ -6,13 +6,14 @@
 
     let permissionGranted = $state(false);
     let isSupported = $state(true); // Default to true, verify on mount
-    let isIOS = $state(false);
+    let errorMessage = $state("");
 
     // Sensor Data State
     let acceleration = $state({ x: 0, y: 0, z: 0 });
     let accelerationIG = $state({ x: 0, y: 0, z: 0 });
     let rotationRate = $state({ alpha: 0, beta: 0, gamma: 0 });
     let interval = $state(0);
+    let activo = $state(false);
     // Helper for heading state (used by p5 if modal is open)
     let compassHeading = $state<{ heading: number; accuracy: number } | null>(
         null,
@@ -21,91 +22,101 @@
     // Modal State
     let showVisualDemo = $state(false);
 
-    onMount(() => {
-        isIOS =
-            typeof (DeviceMotionEvent as any)?.requestPermission === "function";
-        if (!window.DeviceMotionEvent && !window.DeviceOrientationEvent) {
-            isSupported = false;
-        } else if (!isIOS) {
-            // If not iOS, we might already have access or it's not gated
-            // We can try to listen immediately or wait for user action if we want to be consistent
-            // User request implies "Activar Sensores" button is the entry point
-        }
-    });
+    function toggleSensorPermission() {
+        activo = !activo;
+    }
 
-    const requestSensorPermission = async () => {
-        if (
-            typeof (DeviceMotionEvent as any).requestPermission === "function"
-        ) {
-            try {
-                const response = await (
-                    DeviceMotionEvent as any
-                ).requestPermission();
-                if (response === "granted") {
-                    permissionGranted = true;
-                    startSensors();
-                } else {
-                    alert("Permiso denegado para acceder a los sensores.");
+    $effect(() => {
+        const requestSensorPermissions = async () => {
+            errorMessage = ""; // Clear previous errors
+            if (
+                typeof (DeviceMotionEvent as any).requestPermission ===
+                "function"
+            ) {
+                try {
+                    const response = await (
+                        DeviceMotionEvent as any
+                    ).requestPermission();
+                    if (response === "granted") {
+                        permissionGranted = true;
+                        startSensors();
+                    } else {
+                        errorMessage =
+                            "Permiso denegado para acceder a los sensores.";
+                    }
+                } catch (e: any) {
+                    console.error(e);
+                    errorMessage =
+                        "Error al solicitar permisos: " + (e.message || e);
                 }
-            } catch (e) {
-                console.error(e);
-                alert("Error al solicitar permisos: " + e);
+            } else {
+                // Non-iOS or older devices
+                permissionGranted = true;
+                startSensors();
             }
+        };
+
+        const startSensors = () => {
+            window.addEventListener("devicemotion", handleMotion, true);
+            window.addEventListener(
+                "deviceorientation",
+                handleOrientation,
+                true,
+            );
+        };
+
+        const stopSensors = () => {
+            window.removeEventListener("devicemotion", handleMotion, true);
+            window.removeEventListener(
+                "deviceorientation",
+                handleOrientation,
+                true,
+            );
+        };
+
+        const handleMotion = (event: DeviceMotionEvent) => {
+            if (event.acceleration) {
+                acceleration = {
+                    x: event.acceleration.x || 0,
+                    y: event.acceleration.y || 0,
+                    z: event.acceleration.z || 0,
+                };
+            }
+            if (event.accelerationIncludingGravity) {
+                accelerationIG = {
+                    x: event.accelerationIncludingGravity.x || 0,
+                    y: event.accelerationIncludingGravity.y || 0,
+                    z: event.accelerationIncludingGravity.z || 0,
+                };
+            }
+            if (event.rotationRate) {
+                rotationRate = {
+                    alpha: event.rotationRate.alpha || 0,
+                    beta: event.rotationRate.beta || 0,
+                    gamma: event.rotationRate.gamma || 0,
+                };
+            }
+            interval = event.interval || 0;
+        };
+
+        const handleOrientation = (event: DeviceOrientationEvent) => {
+            // Update compass heading state for p5 visualization
+            const heading =
+                (event as any).webkitCompassHeading || 360 - (event.alpha || 0);
+            const accuracy = (event as any).webkitCompassAccuracy || 0;
+            compassHeading = { heading, accuracy };
+        };
+
+        if (activo) {
+            requestSensorPermissions();
         } else {
-            // Non-iOS or older devices
-            permissionGranted = true;
-            startSensors();
+            stopSensors();
         }
-    };
 
-    const startSensors = () => {
-        window.addEventListener("devicemotion", handleMotion, true);
-        window.addEventListener("deviceorientation", handleOrientation, true);
-    };
-
-    const stopSensors = () => {
-        window.removeEventListener("devicemotion", handleMotion, true);
-        window.removeEventListener(
-            "deviceorientation",
-            handleOrientation,
-            true,
-        );
-    };
-
-    const handleMotion = (event: DeviceMotionEvent) => {
-        if (event.acceleration) {
-            acceleration = {
-                x: event.acceleration.x || 0,
-                y: event.acceleration.y || 0,
-                z: event.acceleration.z || 0,
-            };
-        }
-        if (event.accelerationIncludingGravity) {
-            accelerationIG = {
-                x: event.accelerationIncludingGravity.x || 0,
-                y: event.accelerationIncludingGravity.y || 0,
-                z: event.accelerationIncludingGravity.z || 0,
-            };
-        }
-        if (event.rotationRate) {
-            rotationRate = {
-                alpha: event.rotationRate.alpha || 0,
-                beta: event.rotationRate.beta || 0,
-                gamma: event.rotationRate.gamma || 0,
-            };
-        }
-        interval = event.interval || 0;
-    };
-
-    const handleOrientation = (event: DeviceOrientationEvent) => {
-        // Update compass heading state for p5 visualization
-        const heading =
-            (event as any).webkitCompassHeading || 360 - (event.alpha || 0);
-        const accuracy = (event as any).webkitCompassAccuracy || 0;
-        compassHeading = { heading, accuracy };
-    };
-
-    // --- Modal & P5 Logic ---
+        return () => {
+            stopSensors();
+        };
+    });
 
     const openModal = () => {
         showVisualDemo = true;
@@ -130,8 +141,9 @@
             class="flex flex-col items-center justify-center p-8 text-center space-y-6 bg-slate-900/50 rounded-lg border border-slate-800/50"
         >
             <p class="text-slate-400 max-w-sm">
-                Esta API expone los datos de los sensores de movimiento de tu
-                dispositivo, como el acelerómetro y el giroscopio.
+                Esta API permite el uso de los datos de los sensores de
+                movimiento de tu dispositivo, como el acelerómetro y el
+                giroscopio.
             </p>
 
             {#if !isSupported}
@@ -142,8 +154,15 @@
                     función
                 </div>
             {:else}
+                {#if errorMessage}
+                    <div
+                        class="text-red-400 text-xs bg-red-900/20 px-3 py-2 rounded border border-red-900/50"
+                    >
+                        {errorMessage}
+                    </div>
+                {/if}
                 <button
-                    onclick={requestSensorPermission}
+                    onclick={toggleSensorPermission}
                     class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-sky-900/20"
                 >
                     Activar Sensores
