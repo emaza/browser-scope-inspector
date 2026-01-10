@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { ClipboardCopy, AlertTriangle, FileText, Lock, EyeOff } from 'lucide-svelte';
   import Card from './Card.svelte';
+  import Button from './Button.svelte';
 
   let content = $state<string | null>(null);
   let permState = $state<string>('unknown');
@@ -72,16 +73,13 @@
          <p class="text-xs text-amber-100/80 leading-relaxed mb-3">
            Si concedes este permiso, este sitio podrá leer <strong>contraseñas, tarjetas de crédito o mensajes privados</strong> que hayas copiado en otras aplicaciones.
          </p>
-         <button 
-           onclick={handleReadClipboard}
-           disabled={loading}
-           class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded transition-colors shadow-lg shadow-amber-900/20 flex items-center justify-center gap-2"
-         >
-           {loading ? 'Solicitando...' : 'Intentar Leer Portapapeles'}
-           {#if !loading}
-                <FileText size={14} />
-           {/if}
-         </button>
+         <Button
+            text={loading ? 'Solicitando...' : 'Intentar Leer Portapapeles'}
+            icon={ClipboardCopy}
+            on:click={handleReadClipboard}
+            disabled={loading}
+            class="w-full"
+         />
       </div>
     {:else}
       <div class="animate-in fade-in zoom-in duration-300">

@@ -3,6 +3,7 @@
   import Card from './Card.svelte';
   import DataRow from './DataRow.svelte';
   import InfoModal from './InfoModal.svelte';
+  import Button from './Button.svelte';
 
   let location = $state<{lat: number, lon: number, acc: number} | null>(null);
   let fullPosition = $state<GeolocationPosition | null>(null);
@@ -81,19 +82,12 @@
         <p class="text-xs text-slate-400 text-center leading-relaxed">
         Esta API revela tu posición física real. El navegador solicitará tu confirmación antes de compartirla.
         </p>
-        <button 
-        onclick={requestLocation}
-        disabled={loading}
-        class="group flex items-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 hover:text-sky-300 text-xs font-bold py-2.5 px-5 rounded-lg border border-sky-500/20 transition-all disabled:opacity-50"
-        >
-        {loading ? (retryMode ? 'Reintentando (Baja Precisión)...' : 'Solicitando...') : 'Activar GPS'}
-        {#if !loading}
-            <Navigation size={14} class="group-hover:translate-x-0.5 transition-transform" />
-        {/if}
-        {#if retryMode}
-            <RefreshCw size={14} class="animate-spin" />
-        {/if}
-        </button>
+        <Button
+          on:click={requestLocation}
+          disabled={loading}
+          text={loading ? (retryMode ? 'Reintentando...' : 'Solicitando...') : 'Activar GPS'}
+          icon={retryMode ? RefreshCw : Navigation}
+        />
     </div>
   {/if}
 
