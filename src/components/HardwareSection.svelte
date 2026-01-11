@@ -2,7 +2,7 @@
   import { Cpu, Battery, BatteryCharging } from "lucide-svelte";
   import Card from "./Card.svelte";
   import DataRow from "./DataRow.svelte";
-  import type { ExtendedNavigator, BatteryManager } from "../types";
+  import type { ExtendedNavigator, BatteryManager } from "../types/types";
 
   let battery = $state<{ level: number; charging: boolean } | null>(null);
   let gpu = $state("Desconocida");

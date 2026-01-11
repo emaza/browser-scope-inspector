@@ -35,3 +35,33 @@ export interface BehaviorMetrics {
   typingSpeed: number; // roughly wpm logic
   lastInputTime: number;
 }
+
+// SpeechRecognition básico
+export interface SpeechRecognition {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start(): void;
+  stop(): void;
+  onstart(): void;
+  onend(): void;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+}
+
+// Extender el objeto global "window"
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+    SpeechRecognition?: {
+      new(): SpeechRecognition;
+    };
+    webkitSpeechRecognition?: {
+      new(): SpeechRecognition;
+    };
+  }
+}
+
+// Esto asegura que TypeScript trate este archivo como módulo
+export { };
+

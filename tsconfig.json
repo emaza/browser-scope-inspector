@@ -10,12 +10,10 @@
     "isolatedModules": true
   },
   "include": [
-    "*.d.ts",
-    "*.ts",
-    "*.js",
-    "*.svelte",
-    "components/**/*.svelte",
-    "components/**/*.ts"
+    "vite.config.ts",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"
