@@ -12,8 +12,6 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.svelte",
-    "components/**/*.ts",
-    "components/**/*.svelte",
     "src/types/**/*.d.ts"
   ],
   "exclude": [
