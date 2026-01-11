@@ -185,9 +185,16 @@
             });
             streamRef = stream;
 
-            // @ts-ignore
             const AudioContext =
                 window.AudioContext || window.webkitAudioContext;
+            // const AudioContext: typeof window.AudioContext =
+            //     window.AudioContext ??
+            //     (
+            //         window as unknown as {
+            //             webkitAudioContext: typeof window.AudioContext;
+            //         }
+            //     ).webkitAudioContext;
+
             const audioCtx = new AudioContext();
             const analyser = audioCtx.createAnalyser();
             const source = audioCtx.createMediaStreamSource(stream);
@@ -245,9 +252,16 @@
             return;
         }
 
-        // @ts-ignore
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        // const SpeechRecognition: SpeechRecognition | undefined =
+        //     window.SpeechRecognition ??
+        //     (
+        //         window as unknown as {
+        //             webkitSpeechRecognition: SpeechRecognition;
+        //         }
+        //     ).webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
             error =

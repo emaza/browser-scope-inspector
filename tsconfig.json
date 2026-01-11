@@ -10,12 +10,11 @@
     "isolatedModules": true
   },
   "include": [
-    "*.d.ts",
-    "*.ts",
-    "*.js",
-    "*.svelte",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "components/**/*.ts",
     "components/**/*.svelte",
-    "components/**/*.ts"
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

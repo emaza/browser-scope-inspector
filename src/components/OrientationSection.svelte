@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Activity, Compass } from "lucide-svelte";
+    import { Compass } from "lucide-svelte";
     import Card from "./Card.svelte";
     import SensorVisualizerModal from "./SensorVisualizerModal.svelte";
     import Button from "./Button.svelte";
