@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onDestroy } from "svelte";
     import { X } from "lucide-svelte";
     import p5 from "p5";
 
@@ -15,7 +15,7 @@
         heading: { heading: number; accuracy: number } | null;
     } = $props();
 
-    let p5Container: HTMLElement;
+    let p5Container = $state<HTMLElement>();
     let p5Instance: any;
 
     // --- P5 Logic (Ball Class) ---
