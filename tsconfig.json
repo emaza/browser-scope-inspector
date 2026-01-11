@@ -10,6 +10,7 @@
     "isolatedModules": true
   },
   "include": [
+    "vite.config.ts",
     "src/**/*.ts",
     "src/**/*.svelte",
     "src/types/**/*.d.ts"
