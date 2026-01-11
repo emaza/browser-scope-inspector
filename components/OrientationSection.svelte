@@ -337,7 +337,7 @@
 
                 <Button
                     text="Ver demostración visual"
-                    icon={Activity}
+                    icon={Compass}
                     on:click={openModal}
                 />
             </div>
